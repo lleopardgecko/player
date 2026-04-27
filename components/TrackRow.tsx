@@ -57,8 +57,6 @@ export function TrackRow({
     onPlay();
   };
 
-  const badge = track.media_type === 'video' ? 'VIDEO' : 'AUDIO';
-
   return (
     <div className="relative overflow-hidden border-b border-border">
       {/* Action layer */}
@@ -91,18 +89,9 @@ export function TrackRow({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="relative flex w-full items-center gap-3 bg-bg px-4 py-3 text-left transition-transform"
+        className="relative flex w-full items-center bg-bg px-4 py-3 text-left transition-transform"
         style={{ transform: `translateX(${offset}px)` }}
       >
-        <div
-          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md text-[10px] font-semibold tracking-wider ${
-            track.media_type === 'video'
-              ? 'bg-accent2/20 text-accent2'
-              : 'bg-surface2 text-muted'
-          }`}
-        >
-          {badge}
-        </div>
         <div className="min-w-0 flex-1">
           <div
             className={`truncate text-[15px] ${

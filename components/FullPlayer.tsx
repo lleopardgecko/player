@@ -57,12 +57,8 @@ export function FullPlayer({ open, onCollapse }: Props) {
           </header>
 
           <div className="flex flex-1 flex-col items-center justify-center px-6">
-            {isVideo ? (
+            {isVideo && (
               <VideoPortal className="aspect-video w-full overflow-hidden rounded-2xl bg-black" />
-            ) : (
-              <div className="flex aspect-square w-full max-w-sm items-center justify-center rounded-3xl bg-gradient-to-br from-surface2 to-bg">
-                <div className="text-7xl text-muted">♪</div>
-              </div>
             )}
           </div>
 
