@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt-player-v1';
+const CACHE_NAME = 'yt-player-v2';
 const SHELL_FILES = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
