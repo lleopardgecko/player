@@ -16,7 +16,7 @@ export function SpeedControl() {
     <button
       type="button"
       onClick={onClick}
-      className="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-accent"
+      className="rounded-full bg-metal border border-border px-3 py-1 text-[11px] font-semibold text-accent aqua-glow"
     >
       {label}
     </button>

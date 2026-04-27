@@ -14,27 +14,28 @@ export function MiniPlayer({ onExpand }: Props) {
     <button
       type="button"
       onClick={onExpand}
-      className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-surface px-4 py-3 text-left safe-bottom"
+      className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
     >
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium text-accent">
-          {currentTrack.title}
-        </div>
-        <div className="truncate text-xs text-muted">
-          {currentTrack.media_type === 'video' ? 'Video' : 'Audio'}
-        </div>
-      </div>
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           toggle();
         }}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-base text-bg"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-white text-[13px] aqua-glow active:scale-95"
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? '❚❚' : '▶'}
       </button>
+      <div className="lcd-inset min-w-0 flex-1 rounded-md bg-lcd px-3 py-1 text-center">
+        <div className="truncate text-[11px] font-semibold text-accent">
+          {currentTrack.title}
+        </div>
+        <div className="truncate text-[9px] uppercase tracking-wider text-muted">
+          {currentTrack.media_type === 'video' ? 'Video' : 'Audio'}
+        </div>
+      </div>
+      <span className="w-8 text-center text-[14px] text-muted">⌃</span>
     </button>
   );
 }

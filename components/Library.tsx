@@ -68,52 +68,59 @@ export function Library({ onOpenFullPlayer }: Props) {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between gap-3 px-4 pb-3 pt-4 safe-top">
-        <h1 className="text-xl font-semibold tracking-tight text-accent">Library</h1>
+      <header className="flex items-center justify-between gap-3 bg-metal etched border-b border-border px-3 pb-2 pt-3 safe-top">
+        <div className="w-9" />
+        <h1 className="text-[13px] font-bold tracking-tight text-accent">Library</h1>
         <ImportButton onImported={refresh} />
       </header>
 
-      <div className="px-4 pb-3">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search"
-          className="w-full rounded-lg bg-surface px-3 py-2 text-sm text-accent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-border"
-        />
+      <div className="bg-metal-dark border-b border-border px-3 py-2">
+        <div className="relative">
+          <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[11px] text-muted">
+            ⌕
+          </span>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="w-full rounded-full border border-border bg-white pl-6 pr-3 py-1 text-[12px] text-accent placeholder:text-muted shadow-inner focus:outline-none focus:ring-1 focus:ring-aqua"
+          />
+        </div>
+
+        <div className="mt-2 flex rounded-full border border-border bg-metal-dark p-0.5 shadow-inner">
+          {(['all', 'audio', 'video'] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={`flex-1 rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider transition ${
+                filter === f
+                  ? 'bg-selection text-white shadow-inner'
+                  : 'text-accent'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="flex gap-1 px-4 pb-2">
-        {(['all', 'audio', 'video'] as const).map((f) => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={`rounded-full px-3 py-1 text-xs uppercase tracking-wider transition ${
-              filter === f
-                ? 'bg-accent text-bg'
-                : 'bg-surface2 text-muted'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex-1 overflow-y-auto no-scrollbar">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-pinstripe">
         {filtered.length === 0 ? (
           tracks.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="px-8 py-16 text-center text-sm text-muted">
+            <div className="px-8 py-16 text-center text-[12px] text-muted">
               No tracks match.
             </div>
           )
         ) : (
           <ul>
-            {filtered.map((t) => (
+            {filtered.map((t, i) => (
               <li key={t.id}>
                 <TrackRow
                   track={t}
+                  index={i}
                   isCurrent={currentTrack?.id === t.id}
                   onPlay={() => onPlay(t)}
                   onDelete={() => void onDelete(t.id)}
@@ -124,14 +131,14 @@ export function Library({ onOpenFullPlayer }: Props) {
           </ul>
         )}
         {tracks.length > 0 && (
-          <div className="flex items-center justify-between border-t border-border px-4 py-4 text-xs text-muted">
+          <div className="flex items-center justify-between bg-metal etched border-t border-border px-3 py-1.5 text-[11px] text-muted">
             <span>
               {stats.count} tracks · {formatBytes(stats.totalBytes)}
             </span>
             <button
               type="button"
               onClick={onClear}
-              className="text-red-400"
+              className="text-[#a40000]"
             >
               Clear library
             </button>

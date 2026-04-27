@@ -59,7 +59,7 @@ export function ImportButton({ onImported }: Props) {
       <button
         type="button"
         onClick={onPick}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-surface2 text-2xl leading-none text-accent transition active:scale-95"
+        className="flex h-7 w-9 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-[16px] leading-none text-white aqua-glow transition active:scale-95"
         aria-label="Import files"
       >
         +
@@ -73,7 +73,7 @@ export function ImportButton({ onImported }: Props) {
         className="hidden"
       />
       {progress && (
-        <div className="fixed inset-x-0 bottom-0 z-50 bg-surface2 px-4 py-3 text-center text-sm text-accent shadow-lg safe-bottom">
+        <div className="fixed inset-x-0 bottom-0 z-50 bg-metal-dark border-t border-border px-4 py-2 text-center text-[12px] text-accent shadow-lg safe-bottom">
           Importing {progress.done} of {progress.total}…
         </div>
       )}

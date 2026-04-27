@@ -31,7 +31,7 @@ export function FullPlayer({ open, onCollapse }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-bg transition-transform duration-300"
+      className="fixed inset-0 z-40 bg-metal transition-transform duration-300"
       style={{
         transform: open ? 'translateY(0)' : 'translateY(100%)',
       }}
@@ -41,16 +41,16 @@ export function FullPlayer({ open, onCollapse }: Props) {
         <QueueView onClose={() => setShowQueue(false)} />
       ) : (
         <div className="flex h-full flex-col">
-          <header className="flex items-center justify-between px-4 pt-4 pb-2 safe-top">
+          <header className="flex items-center justify-between bg-metal-dark etched border-b border-border px-3 pt-3 pb-2 safe-top">
             <button
               type="button"
               onClick={onCollapse}
-              className="flex h-9 w-9 items-center justify-center text-2xl text-muted"
+              className="flex h-7 w-9 items-center justify-center rounded-full bg-metal border border-border text-[14px] text-accent aqua-glow"
               aria-label="Collapse"
             >
               ⌄
             </button>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+            <div className="rounded-full border border-border bg-white/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
               {isVideo ? 'Video' : 'Audio'}
             </div>
             <div className="w-9" />
@@ -58,31 +58,33 @@ export function FullPlayer({ open, onCollapse }: Props) {
 
           <div className="flex flex-1 flex-col items-center justify-center px-6">
             {isVideo && (
-              <VideoPortal className="aspect-video w-full overflow-hidden rounded-2xl bg-black" />
+              <VideoPortal className="aspect-video w-full overflow-hidden rounded-md border border-border bg-black shadow-inner" />
             )}
           </div>
 
-          <div className="px-6">
-            <div className="mb-1 truncate text-center text-xl font-semibold text-accent">
-              {currentTrack?.title || 'Nothing playing'}
-            </div>
-            <div className="mb-4 truncate text-center text-xs text-muted">
-              {currentTrack
-                ? `${currentTrack.file_ext.toUpperCase()} · ${currentTrack.filename}`
-                : ''}
-            </div>
+          <div className="px-4 pb-2">
+            <div className="lcd-inset rounded-md bg-lcd px-3 py-2">
+              <div className="mb-0.5 truncate text-center text-[13px] font-semibold text-accent">
+                {currentTrack?.title || 'Nothing playing'}
+              </div>
+              <div className="mb-2 truncate text-center text-[10px] text-muted">
+                {currentTrack
+                  ? `${currentTrack.file_ext.toUpperCase()} · ${currentTrack.filename}`
+                  : ''}
+              </div>
 
-            <ProgressBar
-              currentTime={currentTime}
-              duration={duration}
-              onSeek={seekTo}
-            />
+              <ProgressBar
+                currentTime={currentTime}
+                duration={duration}
+                onSeek={seekTo}
+              />
+            </div>
 
             <div className="mt-4 flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => skipBack(15)}
-                className="flex h-12 w-12 items-center justify-center text-xs font-medium text-accent"
+                className="flex h-10 w-12 items-center justify-center rounded-full bg-metal border border-border text-[10px] font-semibold text-accent aqua-glow"
                 aria-label="Skip back 15 seconds"
               >
                 −15
@@ -90,7 +92,7 @@ export function FullPlayer({ open, onCollapse }: Props) {
               <button
                 type="button"
                 onClick={() => void playPrevious()}
-                className="flex h-12 w-12 items-center justify-center text-2xl text-accent"
+                className="flex h-10 w-12 items-center justify-center rounded-full bg-metal border border-border text-[16px] text-accent aqua-glow"
                 aria-label="Previous"
               >
                 ⏮
@@ -98,7 +100,7 @@ export function FullPlayer({ open, onCollapse }: Props) {
               <button
                 type="button"
                 onClick={toggle}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl text-bg active:scale-95"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-[18px] text-white aqua-glow active:scale-95"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? '❚❚' : '▶'}
@@ -106,7 +108,7 @@ export function FullPlayer({ open, onCollapse }: Props) {
               <button
                 type="button"
                 onClick={() => void playNext()}
-                className="flex h-12 w-12 items-center justify-center text-2xl text-accent"
+                className="flex h-10 w-12 items-center justify-center rounded-full bg-metal border border-border text-[16px] text-accent aqua-glow"
                 aria-label="Next"
               >
                 ⏭
@@ -114,19 +116,19 @@ export function FullPlayer({ open, onCollapse }: Props) {
               <button
                 type="button"
                 onClick={() => skipForward(30)}
-                className="flex h-12 w-12 items-center justify-center text-xs font-medium text-accent"
+                className="flex h-10 w-12 items-center justify-center rounded-full bg-metal border border-border text-[10px] font-semibold text-accent aqua-glow"
                 aria-label="Skip forward 30 seconds"
               >
                 +30
               </button>
             </div>
 
-            <div className="mt-6 flex items-center justify-between pb-8 safe-bottom">
+            <div className="mt-4 flex items-center justify-between pb-6 safe-bottom">
               <SpeedControl />
               <button
                 type="button"
                 onClick={() => setShowQueue(true)}
-                className="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-accent"
+                className="rounded-full bg-metal border border-border px-3 py-1 text-[11px] font-semibold text-accent aqua-glow"
               >
                 Queue
               </button>

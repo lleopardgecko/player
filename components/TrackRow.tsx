@@ -6,6 +6,7 @@ import type { Track } from '@/lib/types';
 
 interface Props {
   track: Track;
+  index: number;
   isCurrent: boolean;
   onPlay: () => void;
   onDelete: () => void;
@@ -17,6 +18,7 @@ const MAX_REVEAL = 160;
 
 export function TrackRow({
   track,
+  index,
   isCurrent,
   onPlay,
   onDelete,
@@ -57,8 +59,19 @@ export function TrackRow({
     onPlay();
   };
 
+  const rowBg = isCurrent
+    ? 'bg-selection text-white'
+    : index % 2 === 0
+      ? 'bg-white text-accent'
+      : 'bg-[#edf3fe] text-accent';
+
+  const titleClass = isCurrent
+    ? 'text-white font-semibold'
+    : 'text-accent';
+  const metaClass = isCurrent ? 'text-white/85' : 'text-muted';
+
   return (
-    <div className="relative overflow-hidden border-b border-border">
+    <div className="relative overflow-hidden border-b border-[#c8c8c8]">
       {/* Action layer */}
       <div className="absolute inset-y-0 right-0 flex">
         <button
@@ -67,7 +80,7 @@ export function TrackRow({
             onAddToQueue();
             setOffset(0);
           }}
-          className="h-full w-20 bg-surface2 text-xs font-medium text-accent"
+          className="h-full w-20 bg-metal border-l border-border text-[11px] font-semibold text-accent"
         >
           Queue
         </button>
@@ -77,7 +90,7 @@ export function TrackRow({
             onDelete();
             setOffset(0);
           }}
-          className="h-full w-20 bg-red-600 text-xs font-medium text-white"
+          className="h-full w-20 bg-[linear-gradient(to_bottom,#ff7a7a,#c42020)] text-[11px] font-semibold text-white"
         >
           Delete
         </button>
@@ -89,22 +102,22 @@ export function TrackRow({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="relative flex w-full items-center bg-bg px-4 py-3 text-left transition-transform"
+        className={`relative flex w-full items-center gap-3 px-3 py-1.5 text-left transition-transform ${rowBg}`}
         style={{ transform: `translateX(${offset}px)` }}
       >
+        <span className={`w-3 text-[10px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
+          ▶
+        </span>
         <div className="min-w-0 flex-1">
-          <div
-            className={`truncate text-[15px] ${
-              isCurrent ? 'text-accent2' : 'text-accent'
-            }`}
-          >
+          <div className={`truncate text-[12px] ${titleClass}`}>
             {track.title || track.filename}
           </div>
-          <div className="mt-0.5 flex gap-2 text-xs text-muted">
-            <span>{formatDuration(track.duration_seconds)}</span>
-            <span>·</span>
-            <span>{formatBytes(track.file_size_bytes)}</span>
+          <div className={`mt-0.5 truncate text-[10px] ${metaClass}`}>
+            {track.media_type === 'video' ? 'Video' : 'Audio'} · {formatBytes(track.file_size_bytes)}
           </div>
+        </div>
+        <div className={`tabular-nums text-[11px] ${metaClass}`}>
+          {formatDuration(track.duration_seconds)}
         </div>
       </button>
     </div>
