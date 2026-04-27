@@ -42,6 +42,7 @@ interface PlayerContextValue {
   playPrevious: () => Promise<void>;
   clearQueue: () => void;
   jumpToQueueIndex: (index: number) => Promise<void>;
+  getAudioAnalyser: () => AnalyserNode | null;
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -71,6 +72,36 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const objectUrlRef = useRef<string | null>(null);
   const lastSaveRef = useRef<number>(0);
   const playedHistoryRef = useRef<Track[]>([]);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const audioAnalyserRef = useRef<AnalyserNode | null>(null);
+  const audioSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  const getAudioAnalyser = useCallback((): AnalyserNode | null => {
+    if (typeof window === 'undefined') return null;
+    if (audioAnalyserRef.current) return audioAnalyserRef.current;
+    const audio = audioRef.current;
+    if (!audio) return null;
+    try {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!Ctx) return null;
+      const ctx = new Ctx();
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.78;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      audioCtxRef.current = ctx;
+      audioSourceRef.current = source;
+      audioAnalyserRef.current = analyser;
+      return analyser;
+    } catch {
+      return null;
+    }
+  }, []);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -193,6 +224,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const play = useCallback(
     async (track: Track, queueRest?: Track[]) => {
+      if (track.media_type === 'audio') {
+        getAudioAnalyser();
+        void audioCtxRef.current?.resume();
+      }
       if (currentTrack && currentTrack.id !== track.id) {
         playedHistoryRef.current.push(currentTrack);
         if (playedHistoryRef.current.length > 50) {
@@ -208,7 +243,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       }
       await loadIntoElement(track, true, track.last_position_seconds || 0);
     },
-    [currentTrack, loadIntoElement],
+    [currentTrack, loadIntoElement, getAudioAnalyser],
   );
 
   const pause = useCallback(() => {
@@ -219,12 +254,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const resume = useCallback(async () => {
     const el = activeMediaEl(currentTrack);
     if (!el) return;
+    if (currentTrack?.media_type === 'audio') {
+      getAudioAnalyser();
+      void audioCtxRef.current?.resume();
+    }
     try {
       await el.play();
     } catch {
       /* user gesture required */
     }
-  }, [activeMediaEl, currentTrack]);
+  }, [activeMediaEl, currentTrack, getAudioAnalyser]);
 
   const toggle = useCallback(() => {
     if (isPlaying) pause();
@@ -519,6 +558,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       playPrevious,
       clearQueue,
       jumpToQueueIndex,
+      getAudioAnalyser,
     }),
     [
       currentTrack,
@@ -543,6 +583,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       playPrevious,
       clearQueue,
       jumpToQueueIndex,
+      getAudioAnalyser,
     ],
   );
 

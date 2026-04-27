@@ -6,6 +6,7 @@ import { ProgressBar } from './ProgressBar';
 import { SpeedControl } from './SpeedControl';
 import { VideoPortal } from './VideoPortal';
 import { QueueView } from './QueueView';
+import { Visualizer } from './Visualizer';
 
 interface Props {
   open: boolean;
@@ -56,9 +57,11 @@ export function FullPlayer({ open, onCollapse }: Props) {
             <div className="w-9" />
           </header>
 
-          <div className="flex flex-1 flex-col items-center justify-center px-6">
-            {isVideo && (
+          <div className="flex flex-1 flex-col items-center justify-center px-4 py-3">
+            {isVideo ? (
               <VideoPortal className="aspect-video w-full overflow-hidden rounded-md border border-border bg-black shadow-inner" />
+            ) : (
+              <Visualizer className="h-full w-full" />
             )}
           </div>
 

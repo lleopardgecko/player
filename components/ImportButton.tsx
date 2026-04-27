@@ -59,7 +59,7 @@ export function ImportButton({ onImported }: Props) {
       <button
         type="button"
         onClick={onPick}
-        className="flex h-7 w-9 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-[16px] leading-none text-white aqua-glow transition active:scale-95"
+        className="flex h-9 w-11 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-[20px] leading-none text-white aqua-glow transition active:scale-95"
         aria-label="Import files"
       >
         +

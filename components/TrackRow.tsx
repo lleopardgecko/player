@@ -102,21 +102,21 @@ export function TrackRow({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`relative flex w-full items-center gap-3 px-3 py-1.5 text-left transition-transform ${rowBg}`}
+        className={`relative flex w-full items-center gap-3 px-3 py-2.5 text-left transition-transform ${rowBg}`}
         style={{ transform: `translateX(${offset}px)` }}
       >
-        <span className={`w-3 text-[10px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
+        <span className={`w-3 text-[11px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
           ▶
         </span>
         <div className="min-w-0 flex-1">
-          <div className={`truncate text-[12px] ${titleClass}`}>
+          <div className={`truncate text-[14px] ${titleClass}`}>
             {track.title || track.filename}
           </div>
-          <div className={`mt-0.5 truncate text-[10px] ${metaClass}`}>
+          <div className={`mt-0.5 truncate text-[11px] ${metaClass}`}>
             {track.media_type === 'video' ? 'Video' : 'Audio'} · {formatBytes(track.file_size_bytes)}
           </div>
         </div>
-        <div className={`tabular-nums text-[11px] ${metaClass}`}>
+        <div className={`tabular-nums text-[12px] ${metaClass}`}>
           {formatDuration(track.duration_seconds)}
         </div>
       </button>
