@@ -117,7 +117,7 @@ export function Visualizer({ className }: Props) {
   if (!mounted) {
     return (
       <div
-        className={`relative overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
+        className={`relative flex flex-col overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
           className ?? ''
         }`}
         suppressHydrationWarning
@@ -127,7 +127,7 @@ export function Visualizer({ className }: Props) {
 
   return (
     <div
-      className={`relative overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
+      className={`relative flex flex-col overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
         className ?? ''
       }`}
       suppressHydrationWarning
@@ -152,20 +152,18 @@ export function Visualizer({ className }: Props) {
         />
         {isPlaying ? 'Live' : 'Idle'}
       </div>
-      <div className="flex h-full items-end gap-3 px-3 pb-3 pt-9">
-        <div className="flex h-full w-1/3 max-w-[140px] items-center justify-center">
-          <div className="flex h-full w-full max-h-32 max-w-32 items-center justify-center rounded-md border border-border bg-[linear-gradient(135deg,#3a8eff_0%,#0a4ec2_100%)] text-[44px] font-bold text-white shadow-inner">
-            <span
-              className="drop-shadow-[0_1px_0_rgba(0,0,0,0.4)]"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              {initial}
-            </span>
-          </div>
+      <div className="flex min-h-0 flex-1 items-stretch gap-3 px-3 pb-3 pt-9">
+        <div className="flex aspect-square h-full max-w-[40%] items-center justify-center rounded-md border border-border bg-[linear-gradient(135deg,#3a8eff_0%,#0a4ec2_100%)] text-[44px] font-bold text-white shadow-inner">
+          <span
+            className="drop-shadow-[0_1px_0_rgba(0,0,0,0.4)]"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            {initial}
+          </span>
         </div>
         <canvas
           ref={canvasRef}
-          className="h-full flex-1"
+          className="h-full min-w-0 flex-1"
           style={{ display: 'block' }}
         />
       </div>

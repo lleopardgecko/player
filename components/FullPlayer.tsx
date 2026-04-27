@@ -57,11 +57,11 @@ export function FullPlayer({ open, onCollapse }: Props) {
             <div className="w-9" />
           </header>
 
-          <div className="flex flex-1 flex-col items-center justify-center px-4 py-3">
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-3">
             {isVideo ? (
               <VideoPortal className="aspect-video w-full overflow-hidden rounded-md border border-border bg-black shadow-inner" />
             ) : (
-              <Visualizer className="h-full w-full" />
+              <Visualizer className="min-h-0 w-full flex-1" />
             )}
           </div>
 
