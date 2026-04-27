@@ -78,26 +78,40 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioAnalyserRef = useRef<AnalyserNode | null>(null);
-  const audioSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
+  // Tap audio for the visualizer via captureStream so the element's native
+  // audio output is untouched. Routing the element through an AudioContext
+  // (createMediaElementSource) breaks iOS lock-screen / background playback
+  // because the context suspends when the page is backgrounded.
   const getAudioAnalyser = useCallback((): AnalyserNode | null => {
     if (typeof window === 'undefined') return null;
     if (audioAnalyserRef.current) return audioAnalyserRef.current;
-    const audio = audioRef.current;
+    const audio = audioRef.current as
+      | (HTMLAudioElement & {
+          captureStream?: () => MediaStream;
+          mozCaptureStream?: () => MediaStream;
+        })
+      | null;
     if (!audio) return null;
+    const capture =
+      audio.captureStream?.bind(audio) ??
+      audio.mozCaptureStream?.bind(audio);
+    if (!capture) return null;
     try {
       const Ctx =
         window.AudioContext ||
         (window as unknown as { webkitAudioContext?: typeof AudioContext })
           .webkitAudioContext;
       if (!Ctx) return null;
+      const stream = capture();
+      if (!stream || stream.getAudioTracks().length === 0) return null;
       const ctx = new Ctx();
-      const source = ctx.createMediaElementSource(audio);
+      const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 128;
       analyser.smoothingTimeConstant = 0.78;
       source.connect(analyser);
-      analyser.connect(ctx.destination);
       audioCtxRef.current = ctx;
       audioSourceRef.current = source;
       audioAnalyserRef.current = analyser;
