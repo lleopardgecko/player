@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePlayer } from './PlayerProvider';
 
 interface Props {
@@ -11,8 +11,14 @@ export function Visualizer({ className }: Props) {
   const { getAudioAnalyser, isPlaying, currentTrack } = usePlayer();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fallbackPhaseRef = useRef(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -103,16 +109,28 @@ export function Visualizer({ className }: Props) {
     };
     draw();
     return () => cancelAnimationFrame(raf);
-  }, [getAudioAnalyser, isPlaying, currentTrack?.id]);
+  }, [getAudioAnalyser, isPlaying, currentTrack?.id, mounted]);
 
   const title = currentTrack?.title ?? '';
   const initial = title.trim().charAt(0).toUpperCase() || '♪';
+
+  if (!mounted) {
+    return (
+      <div
+        className={`relative overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
+          className ?? ''
+        }`}
+        suppressHydrationWarning
+      />
+    );
+  }
 
   return (
     <div
       className={`relative overflow-hidden rounded-md border border-border bg-lcd shadow-inner ${
         className ?? ''
       }`}
+      suppressHydrationWarning
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
