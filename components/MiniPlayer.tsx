@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { usePlayer } from './PlayerProvider';
 
 interface Props {
@@ -8,7 +9,29 @@ interface Props {
 
 export function MiniPlayer({ onExpand }: Props) {
   const { currentTrack, isPlaying, toggle } = usePlayer();
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(
+    null,
+  );
   if (!currentTrack) return null;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dy = start.y - t.clientY;
+    const dx = Math.abs(t.clientX - start.x);
+    const dt = Date.now() - start.t;
+    // upward swipe: > 30px vertical, mostly vertical, under 600ms
+    if (dy > 30 && dy > dx && dt < 600) {
+      e.preventDefault();
+      onExpand();
+    }
+  };
 
   return (
     <div
@@ -21,7 +44,9 @@ export function MiniPlayer({ onExpand }: Props) {
           onExpand();
         }
       }}
-      className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer touch-pan-x items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
     >
       <button
         type="button"

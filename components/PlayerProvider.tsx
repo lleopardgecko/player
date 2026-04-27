@@ -294,9 +294,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [activeMediaEl, currentTrack, getAudioAnalyser]);
 
   const toggle = useCallback(() => {
-    if (isPlaying) pause();
-    else void resume();
-  }, [isPlaying, pause, resume]);
+    // Read the element's real paused state — React `isPlaying` lags
+    // because play/pause events fire async, which made rapid taps and
+    // post-interruption taps do the wrong thing.
+    const el = activeMediaEl(currentTrack);
+    if (!el) return;
+    if (el.paused) void resume();
+    else pause();
+  }, [activeMediaEl, currentTrack, pause, resume]);
 
   const seekTo = useCallback(
     (seconds: number) => {
