@@ -67,7 +67,7 @@ export function ImportButton({ onImported }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="audio/*,video/*"
+        accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus,.webm,.mp4,.m4v,.mov"
         multiple
         onChange={onChange}
         className="hidden"
