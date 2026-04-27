@@ -11,10 +11,17 @@ export function MiniPlayer({ onExpand }: Props) {
   if (!currentTrack) return null;
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onExpand}
-      className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onExpand();
+        }
+      }}
+      className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
     >
       <button
         type="button"
@@ -36,6 +43,6 @@ export function MiniPlayer({ onExpand }: Props) {
         </div>
       </div>
       <span className="w-8 text-center text-[14px] text-muted">⌃</span>
-    </button>
+    </div>
   );
 }

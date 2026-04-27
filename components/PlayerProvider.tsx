@@ -71,7 +71,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const videoHostRef = useRef<HTMLDivElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
   const lastSaveRef = useRef<number>(0);
-  const playedHistoryRef = useRef<Track[]>([]);
+  const playedHistoryRef = useRef<number[]>([]);
+  const pendingLoadedMetaRef = useRef<{
+    el: HTMLMediaElement;
+    handler: () => void;
+  } | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioAnalyserRef = useRef<AnalyserNode | null>(null);
   const audioSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -192,9 +196,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
       target.src = url;
       target.playbackRate = playbackRate;
-      // wait for metadata to seek reliably
+      // wait for metadata to seek reliably; remove any pending handler
+      // from a previous load so it can't fire against this new src
+      const pending = pendingLoadedMetaRef.current;
+      if (pending) {
+        pending.el.removeEventListener('loadedmetadata', pending.handler);
+        pendingLoadedMetaRef.current = null;
+      }
       const onLoaded = async () => {
         target.removeEventListener('loadedmetadata', onLoaded);
+        if (pendingLoadedMetaRef.current?.handler === onLoaded) {
+          pendingLoadedMetaRef.current = null;
+        }
         if (seekSeconds > 0 && isFinite(target.duration)) {
           try {
             target.currentTime = Math.min(seekSeconds, target.duration - 0.5);
@@ -210,6 +223,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           }
         }
       };
+      pendingLoadedMetaRef.current = { el: target, handler: onLoaded };
       target.addEventListener('loadedmetadata', onLoaded);
       target.load();
 
@@ -229,7 +243,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         void audioCtxRef.current?.resume();
       }
       if (currentTrack && currentTrack.id !== track.id) {
-        playedHistoryRef.current.push(currentTrack);
+        playedHistoryRef.current.push(currentTrack.id);
         if (playedHistoryRef.current.length > 50) {
           playedHistoryRef.current.shift();
         }
@@ -348,18 +362,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     void setAppState('queue', []);
   }, []);
 
+  const queueRef = useRef<Track[]>([]);
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
   const playNext = useCallback(async () => {
-    setQueue((q) => {
-      if (q.length === 0) return q;
-      const [head, ...rest] = q;
-      void loadIntoElement(head, true, 0);
-      void setAppState(
-        'queue',
-        rest.map((t) => t.id),
-      );
-      return rest;
-    });
-  }, [loadIntoElement]);
+    const q = queueRef.current;
+    if (q.length === 0) return;
+    const [head, ...rest] = q;
+    setQueue(rest);
+    void setAppState('queue', rest.map((t) => t.id));
+    if (currentTrack && currentTrack.id !== head.id) {
+      playedHistoryRef.current.push(currentTrack.id);
+      if (playedHistoryRef.current.length > 50) {
+        playedHistoryRef.current.shift();
+      }
+    }
+    await loadIntoElement(head, true, 0);
+  }, [currentTrack, loadIntoElement]);
 
   const playPrevious = useCallback(async () => {
     const hist = playedHistoryRef.current;
@@ -368,25 +389,29 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (el) el.currentTime = 0;
       return;
     }
-    const prev = hist.pop()!;
+    const prevId = hist.pop()!;
+    const prev = await getTrack(prevId);
+    if (!prev) return;
     await loadIntoElement(prev, true, 0);
   }, [activeMediaEl, currentTrack, loadIntoElement]);
 
   const jumpToQueueIndex = useCallback(
     async (index: number) => {
-      setQueue((q) => {
-        if (index < 0 || index >= q.length) return q;
-        const target = q[index];
-        const rest = q.slice(index + 1);
-        void loadIntoElement(target, true, 0);
-        void setAppState(
-          'queue',
-          rest.map((t) => t.id),
-        );
-        return rest;
-      });
+      const q = queueRef.current;
+      if (index < 0 || index >= q.length) return;
+      const target = q[index];
+      const rest = q.slice(index + 1);
+      setQueue(rest);
+      void setAppState('queue', rest.map((t) => t.id));
+      if (currentTrack && currentTrack.id !== target.id) {
+        playedHistoryRef.current.push(currentTrack.id);
+        if (playedHistoryRef.current.length > 50) {
+          playedHistoryRef.current.shift();
+        }
+      }
+      await loadIntoElement(target, true, 0);
     },
-    [loadIntoElement],
+    [currentTrack, loadIntoElement],
   );
 
   // keep refs current
@@ -499,15 +524,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     })();
   }, [loadIntoElement]);
 
+  const [videoHostEl, setVideoHostEl] = useState<HTMLDivElement | null>(null);
+
   // video portal: move video element between hidden home and host on demand
   useEffect(() => {
     const video = videoRef.current;
     const home = videoHomeRef.current;
-    const host = videoHostRef.current;
     if (!video || !home) return;
-    if (currentTrack?.media_type === 'video' && host) {
-      if (video.parentElement !== host) {
-        host.appendChild(video);
+    if (currentTrack?.media_type === 'video' && videoHostEl) {
+      if (video.parentElement !== videoHostEl) {
+        videoHostEl.appendChild(video);
         Object.assign(video.style, {
           position: '',
           width: '100%',
@@ -524,14 +550,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         Object.assign(video.style, VIDEO_HIDDEN_STYLE as Record<string, string>);
       }
     }
-  });
+  }, [currentTrack, videoHostEl]);
 
   const setVideoHost = useCallback((el: HTMLDivElement | null) => {
     videoHostRef.current = el;
-    // trigger a re-render so the effect runs
-    setVideoHostTick((t) => t + 1);
+    setVideoHostEl(el);
   }, []);
-  const [, setVideoHostTick] = useState(0);
 
   const value = useMemo<PlayerContextValue>(
     () => ({
