@@ -276,7 +276,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const pause = useCallback(() => {
     const el = activeMediaEl(currentTrack);
-    el?.pause();
+    if (!el) return;
+    setIsPlaying(false);
+    el.pause();
   }, [activeMediaEl, currentTrack]);
 
   const resume = useCallback(async () => {
@@ -286,10 +288,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       getAudioAnalyser();
       void audioCtxRef.current?.resume();
     }
+    // If the previous play-through ended, restart from 0 so the tap actually plays.
+    if (el.ended || (isFinite(el.duration) && el.currentTime >= el.duration - 0.05)) {
+      try {
+        el.currentTime = 0;
+      } catch {
+        /* noop */
+      }
+    }
+    setIsPlaying(true);
     try {
       await el.play();
     } catch {
-      /* user gesture required */
+      setIsPlaying(false);
     }
   }, [activeMediaEl, currentTrack, getAudioAnalyser]);
 
@@ -475,14 +486,27 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }
       }
     };
-    const onEnded = () => {
+    const onEnded = (e: Event) => {
       if (currentTrack) {
         void updateTrackFields(currentTrack.id, {
           last_position_seconds: 0,
           last_played_at: Date.now(),
         });
       }
-      void playNextRef.current?.();
+      if (queueRef.current.length > 0) {
+        void playNextRef.current?.();
+      } else {
+        // Nothing queued: rewind so the next play tap starts from the top
+        // instead of trying to play from the end (which silently fails).
+        const el = e.target as HTMLMediaElement;
+        try {
+          el.currentTime = 0;
+        } catch {
+          /* noop */
+        }
+        setIsPlaying(false);
+        setCurrentTime(0);
+      }
     };
     const onRateChange = (e: Event) => {
       const r = (e.target as HTMLMediaElement).playbackRate;
