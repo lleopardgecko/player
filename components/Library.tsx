@@ -102,36 +102,31 @@ export function Library({ onOpenFullPlayer }: Props) {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between gap-3 bg-metal etched border-b border-border px-3 pb-2 pt-3 safe-top">
+    <div className="flex h-full flex-col bg-white">
+      <header className="flex items-center justify-between gap-3 border-b border-border bg-white px-4 pb-3 pt-3 safe-top">
         <div className="w-11" />
-        <h1 className="text-[15px] font-bold tracking-tight text-accent">Library</h1>
+        <h1 className="text-[16px] font-bold text-accent">Library</h1>
         <ImportButton onImported={refresh} />
       </header>
 
-      <div className="bg-metal-dark border-b border-border px-3 py-3">
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-muted">
-            ⌕
-          </span>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
-            className="w-full rounded-full border border-border bg-white pl-8 pr-3 py-2 text-[14px] text-accent placeholder:text-muted shadow-inner focus:outline-none focus:ring-1 focus:ring-aqua"
-          />
-        </div>
+      <div className="border-b border-border bg-white px-4 py-3">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search"
+          className="w-full rounded-full border border-border bg-surface px-4 py-2.5 text-[14px] text-accent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+        />
 
-        <div className="mt-2.5 flex rounded-full border border-border bg-metal-dark p-0.5 shadow-inner">
+        <div className="mt-3 flex gap-1">
           {(['all', 'audio', 'video'] as const).map((f) => (
             <button
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className={`flex-1 rounded-full px-3 py-1.5 text-[12px] font-semibold uppercase tracking-wider transition ${
+              className={`rounded-full px-4 py-1.5 text-[13px] font-medium capitalize transition ${
                 filter === f
-                  ? 'bg-selection text-white shadow-inner'
-                  : 'text-accent'
+                  ? 'bg-accent text-white'
+                  : 'text-muted active:bg-surface'
               }`}
             >
               {f}
@@ -140,12 +135,12 @@ export function Library({ onOpenFullPlayer }: Props) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar bg-pinstripe">
+      <div className="no-scrollbar flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
           tracks.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="px-8 py-16 text-center text-[12px] text-muted">
+            <div className="px-8 py-16 text-center text-[13px] text-muted">
               No tracks match.
             </div>
           )
@@ -166,20 +161,19 @@ export function Library({ onOpenFullPlayer }: Props) {
           </ul>
         )}
         {tracks.length > 0 && (
-          <div className="flex items-center justify-between bg-metal etched border-t border-border px-3 py-1.5 text-[11px] text-muted">
+          <div className="flex items-center justify-between border-t border-border px-4 py-2 text-[12px] text-muted">
             <span>
               {stats.count} tracks · {formatBytes(stats.totalBytes)}
             </span>
             <button
               type="button"
               onClick={onClear}
-              className="text-[#a40000]"
+              className="text-[#c0392b]"
             >
               Clear library
             </button>
           </div>
         )}
-        {/* spacer for mini-player */}
         <div className="h-20" />
       </div>
     </div>

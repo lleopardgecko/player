@@ -8,9 +8,9 @@
 
 html,
 body {
-  background: #dcdcdc;
-  color: #1a1a1a;
-  font-size: 12px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
@@ -43,24 +43,4 @@ input[type='range'] {
 }
 .safe-top {
   padding-top: env(safe-area-inset-top);
-}
-
-.etched {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-}
-
-.lcd-inset {
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.6);
-  border: 1px solid #6f7a85;
-}
-
-.aqua-glow {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-    0 1px 2px rgba(0, 0, 0, 0.25);
 }

@@ -18,7 +18,6 @@ const MAX_REVEAL = 160;
 
 export function TrackRow({
   track,
-  index,
   isCurrent,
   onPlay,
   onDelete,
@@ -59,19 +58,8 @@ export function TrackRow({
     onPlay();
   };
 
-  const rowBg = isCurrent
-    ? 'bg-selection text-white'
-    : index % 2 === 0
-      ? 'bg-white text-accent'
-      : 'bg-[#edf3fe] text-accent';
-
-  const titleClass = isCurrent
-    ? 'text-white font-semibold'
-    : 'text-accent';
-  const metaClass = isCurrent ? 'text-white/85' : 'text-muted';
-
   return (
-    <div className="relative overflow-hidden border-b border-[#c8c8c8]">
+    <div className="relative overflow-hidden border-b border-border">
       {/* Action layer */}
       <div className="absolute inset-y-0 right-0 flex">
         <button
@@ -80,7 +68,7 @@ export function TrackRow({
             onAddToQueue();
             setOffset(0);
           }}
-          className="h-full w-20 bg-metal border-l border-border text-[11px] font-semibold text-accent"
+          className="h-full w-20 border-l border-border bg-surface text-[13px] font-medium text-accent"
         >
           Queue
         </button>
@@ -90,7 +78,7 @@ export function TrackRow({
             onDelete();
             setOffset(0);
           }}
-          className="h-full w-20 bg-[linear-gradient(to_bottom,#ff7a7a,#c42020)] text-[11px] font-semibold text-white"
+          className="h-full w-20 bg-[#c0392b] text-[13px] font-medium text-white"
         >
           Delete
         </button>
@@ -102,21 +90,23 @@ export function TrackRow({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`relative flex w-full items-center gap-3 px-3 py-2.5 text-left transition-transform ${rowBg}`}
+        className={`relative flex w-full items-center gap-3 px-4 py-3.5 text-left transition-transform ${
+          isCurrent ? 'bg-accent text-white' : 'bg-white text-accent'
+        }`}
         style={{ transform: `translateX(${offset}px)` }}
       >
-        <span className={`w-3 text-[11px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
+        <span className={`w-3 text-[12px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
           ▶
         </span>
         <div className="min-w-0 flex-1">
-          <div className={`truncate text-[14px] ${titleClass}`}>
+          <div className={`truncate text-[15px] font-medium ${isCurrent ? 'text-white' : 'text-accent'}`}>
             {track.title || track.filename}
           </div>
-          <div className={`mt-0.5 truncate text-[11px] ${metaClass}`}>
+          <div className={`mt-0.5 truncate text-[12px] ${isCurrent ? 'text-white/70' : 'text-muted'}`}>
             {track.media_type === 'video' ? 'Video' : 'Audio'} · {formatBytes(track.file_size_bytes)}
           </div>
         </div>
-        <div className={`tabular-nums text-[12px] ${metaClass}`}>
+        <div className={`tabular-nums text-[13px] ${isCurrent ? 'text-white/70' : 'text-muted'}`}>
           {formatDuration(track.duration_seconds)}
         </div>
       </button>

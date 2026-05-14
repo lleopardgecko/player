@@ -26,7 +26,6 @@ export function MiniPlayer({ onExpand }: Props) {
     const dy = start.y - t.clientY;
     const dx = Math.abs(t.clientX - start.x);
     const dt = Date.now() - start.t;
-    // upward swipe: > 30px vertical, mostly vertical, under 600ms
     if (dy > 30 && dy > dx && dt < 600) {
       e.preventDefault();
       onExpand();
@@ -46,7 +45,7 @@ export function MiniPlayer({ onExpand }: Props) {
       }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer touch-pan-x items-center gap-3 bg-metal etched border-t border-border px-3 py-2 text-left safe-bottom"
+      className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer touch-pan-x items-center gap-3 border-t border-border bg-white px-4 py-3 text-left safe-bottom"
     >
       <button
         type="button"
@@ -54,20 +53,20 @@ export function MiniPlayer({ onExpand }: Props) {
           e.stopPropagation();
           toggle();
         }}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-aqua-button border border-aqua-dark text-white text-[13px] aqua-glow active:scale-95"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-[15px] text-white active:opacity-75"
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? '❚❚' : '▶'}
       </button>
-      <div className="lcd-inset min-w-0 flex-1 rounded-md bg-lcd px-3 py-1 text-center">
-        <div className="truncate text-[11px] font-semibold text-accent">
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[14px] font-medium text-accent">
           {currentTrack.title}
         </div>
-        <div className="truncate text-[9px] uppercase tracking-wider text-muted">
+        <div className="truncate text-[11px] text-muted">
           {currentTrack.media_type === 'video' ? 'Video' : 'Audio'}
         </div>
       </div>
-      <span className="w-8 text-center text-[14px] text-muted">⌃</span>
+      <span className="text-[16px] text-muted">⌃</span>
     </div>
   );
 }

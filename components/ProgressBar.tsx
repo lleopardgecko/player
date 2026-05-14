@@ -48,19 +48,19 @@ export function ProgressBar({ currentTime, duration, onSeek }: Props) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className="relative h-6 cursor-pointer touch-none"
+        className="relative h-8 cursor-pointer touch-none"
       >
-        <div className="absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full border border-border bg-white shadow-inner" />
+        <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-border" />
         <div
-          className="absolute left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-selection"
+          className="absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent"
           style={{ width: `${ratio * 100}%` }}
         />
         <div
-          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-aqua-button border border-aqua-dark aqua-glow"
+          className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent"
           style={{ left: `${ratio * 100}%` }}
         />
       </div>
-      <div className="mt-0.5 flex justify-between text-[10px] tabular-nums text-accent">
+      <div className="flex justify-between text-[12px] tabular-nums text-muted">
         <span>{formatDuration(display)}</span>
         <span>{formatDuration(duration)}</span>
       </div>
