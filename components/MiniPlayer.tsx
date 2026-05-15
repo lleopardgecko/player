@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { usePlayer } from './PlayerProvider';
+import { useBlobUrl } from '@/lib/useBlobUrl';
 
 interface Props {
   onExpand: () => void;
@@ -9,6 +10,7 @@ interface Props {
 
 export function MiniPlayer({ onExpand }: Props) {
   const { currentTrack, isPlaying, toggle } = usePlayer();
+  const thumbUrl = useBlobUrl(currentTrack?.thumb_blob ?? null);
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(
     null,
   );
@@ -47,6 +49,13 @@ export function MiniPlayer({ onExpand }: Props) {
       onTouchEnd={onTouchEnd}
       className="fixed inset-x-0 bottom-0 z-30 flex cursor-pointer touch-pan-x items-center gap-3 border-t border-border bg-white px-4 py-3 text-left safe-bottom"
     >
+      {thumbUrl && (
+        <img
+          src={thumbUrl}
+          alt=""
+          className="h-11 w-11 shrink-0 rounded object-cover"
+        />
+      )}
       <button
         type="button"
         onClick={(e) => {

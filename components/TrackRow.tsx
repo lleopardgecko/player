@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { formatBytes, formatDuration } from '@/lib/format';
+import { useBlobUrl } from '@/lib/useBlobUrl';
 import type { Track } from '@/lib/types';
 
 interface Props {
@@ -23,6 +24,7 @@ export function TrackRow({
   onDelete,
   onAddToQueue,
 }: Props) {
+  const thumbUrl = useBlobUrl(track.thumb_blob);
   const [offset, setOffset] = useState(0);
   const startXRef = useRef<number | null>(null);
   const startOffsetRef = useRef(0);
@@ -95,9 +97,18 @@ export function TrackRow({
         }`}
         style={{ transform: `translateX(${offset}px)` }}
       >
-        <span className={`w-3 text-[12px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
+        <span className={`w-3 shrink-0 text-[12px] ${isCurrent ? 'text-white' : 'text-transparent'}`}>
           ▶
         </span>
+        {thumbUrl ? (
+          <img
+            src={thumbUrl}
+            alt=""
+            className="h-11 w-11 shrink-0 rounded object-cover"
+          />
+        ) : (
+          <div className="h-11 w-11 shrink-0 rounded bg-surface" />
+        )}
         <div className="min-w-0 flex-1">
           <div className={`truncate text-[15px] font-medium ${isCurrent ? 'text-white' : 'text-accent'}`}>
             {track.title || track.filename}

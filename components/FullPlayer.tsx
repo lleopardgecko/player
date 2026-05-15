@@ -7,6 +7,7 @@ import { SpeedControl } from './SpeedControl';
 import { VideoPortal } from './VideoPortal';
 import { QueueView } from './QueueView';
 import { Visualizer } from './Visualizer';
+import { useBlobUrl } from '@/lib/useBlobUrl';
 
 interface Props {
   open: boolean;
@@ -29,6 +30,7 @@ export function FullPlayer({ open, onCollapse }: Props) {
   const [showQueue, setShowQueue] = useState(false);
 
   const isVideo = currentTrack?.media_type === 'video';
+  const thumbUrl = useBlobUrl(currentTrack?.thumb_blob ?? null);
 
   return (
     <div
@@ -60,6 +62,12 @@ export function FullPlayer({ open, onCollapse }: Props) {
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-4">
             {isVideo ? (
               <VideoPortal className="aspect-video w-full overflow-hidden rounded-lg bg-black" />
+            ) : thumbUrl ? (
+              <img
+                src={thumbUrl}
+                alt=""
+                className="min-h-0 w-full flex-1 rounded-xl object-contain"
+              />
             ) : (
               <Visualizer className="min-h-0 w-full flex-1" />
             )}

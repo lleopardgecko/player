@@ -16,6 +16,12 @@ const VIDEO_EXTS = new Set(['mp4', 'mkv', 'mov', 'avi', 'm4v']);
 const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 const YT_BRACKET_RE = /^(.*) \[[A-Za-z0-9_-]{11}\]$/;
 
+export function getFileStem(filename: string): string {
+  if (filename.endsWith('.info.json')) return filename.slice(0, -'.info.json'.length);
+  const dot = filename.lastIndexOf('.');
+  return dot > 0 ? filename.slice(0, dot) : filename;
+}
+
 export function getExtension(filename: string): string {
   const dot = filename.lastIndexOf('.');
   if (dot < 0 || dot === filename.length - 1) return '';

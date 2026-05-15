@@ -13,6 +13,7 @@ import { probeDuration } from '@/lib/probe';
 import type { MediaType, Track } from '@/lib/types';
 import { usePlayer } from './PlayerProvider';
 import { ImportButton } from './ImportButton';
+import { EnrichButton } from './EnrichButton';
 import { TrackRow } from './TrackRow';
 import { EmptyState } from './EmptyState';
 
@@ -104,7 +105,7 @@ export function Library({ onOpenFullPlayer }: Props) {
   return (
     <div className="flex h-full flex-col bg-white">
       <header className="flex items-center justify-between gap-3 border-b border-border bg-white px-4 pb-3 pt-3 safe-top">
-        <div className="w-11" />
+        <EnrichButton onEnriched={refresh} />
         <h1 className="text-[16px] font-bold text-accent">Library</h1>
         <ImportButton onImported={refresh} />
       </header>
