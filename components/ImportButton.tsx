@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { addTrack, findDuplicate } from '@/lib/db';
-import { deriveTitle, getExtension, inferMediaType } from '@/lib/format';
+import { addTrack, findDuplicate, getAllTracks, updateTrackFields } from '@/lib/db';
+import { deriveTitle, getExtension, getFileStem, inferMediaType } from '@/lib/format';
 import type { NewTrack } from '@/lib/types';
 
 interface Props {
@@ -11,9 +11,7 @@ interface Props {
 
 export function ImportButton({ onImported }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(
-    null,
-  );
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const onPick = () => inputRef.current?.click();
 
@@ -21,10 +19,18 @@ export function ImportButton({ onImported }: Props) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = '';
     if (files.length === 0) return;
+
+    const mediaFiles = files.filter(
+      (f) => !f.name.endsWith('.info.json') && !f.type.startsWith('image/'),
+    );
+    const infos = files.filter((f) => f.name.endsWith('.info.json'));
+    const images = files.filter((f) => f.type.startsWith('image/'));
+
     setProgress({ done: 0, total: files.length });
-    let added = 0;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    let done = 0;
+    let changed = 0;
+
+    for (const file of mediaFiles) {
       try {
         const dup = await findDuplicate(file.name, file.size);
         if (!dup) {
@@ -43,15 +49,49 @@ export function ImportButton({ onImported }: Props) {
             last_position_seconds: 0,
           };
           await addTrack(track);
-          added++;
+          changed++;
         }
       } catch (err) {
         console.error('Import failed for', file.name, err);
       }
-      setProgress({ done: i + 1, total: files.length });
+      setProgress({ done: ++done, total: files.length });
     }
+
+    if (infos.length > 0 || images.length > 0) {
+      const tracks = await getAllTracks();
+      const byStem = new Map<string, number>();
+      for (const t of tracks) {
+        byStem.set(getFileStem(t.filename), t.id);
+      }
+
+      for (const f of infos) {
+        try {
+          const id = byStem.get(getFileStem(f.name));
+          if (id != null) {
+            const json = JSON.parse(await f.text()) as { duration?: number };
+            if (typeof json.duration === 'number' && json.duration > 0) {
+              await updateTrackFields(id, { duration_seconds: json.duration });
+              changed++;
+            }
+          }
+        } catch {}
+        setProgress({ done: ++done, total: files.length });
+      }
+
+      for (const f of images) {
+        try {
+          const id = byStem.get(getFileStem(f.name));
+          if (id != null) {
+            await updateTrackFields(id, { thumb_blob: f });
+            changed++;
+          }
+        } catch {}
+        setProgress({ done: ++done, total: files.length });
+      }
+    }
+
     setProgress(null);
-    if (added > 0) onImported();
+    if (changed > 0) onImported();
   };
 
   return (
@@ -67,7 +107,7 @@ export function ImportButton({ onImported }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus,.webm,.mp4,.m4v,.mov"
+        accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus,.webm,.mp4,.m4v,.mov,.json,image/*"
         multiple
         onChange={onChange}
         className="hidden"
